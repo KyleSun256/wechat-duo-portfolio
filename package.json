@@ -1,0 +1,1 @@
+{"name":"tecent-test","private":true,"type":"module","scripts":{"dev":"node server.mjs","check":"node --check main.js && node --check server.mjs"}}
