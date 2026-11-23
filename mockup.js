@@ -54,12 +54,13 @@ function foldEase(value,x1,y1,x2,y2){
   return curve((low+high)/2,y1,y2);
 }
 function foldProgress(t,start,end,ease){if(t<=start)return 0;if(t>=end)return 1;return foldEase((t-start)/(end-start),...ease)}
-const foldImagesPromise=Promise.all(['100','99','98','103'].map(async id=>{const image=new Image();image.src=`assets/fold-${id}.png`;await image.decode();return image}));
+let foldImagesPromise;
+function loadFoldImages(){return foldImagesPromise ??= Promise.all(['100','99','98','103'].map(async id=>{const image=new Image();image.src=`assets/fold-${id}.png`;await image.decode();return image}));}
 async function playRuleOneFoldAnimation({delay=0}={}){
   if(playbackActive||selectedRule!==1||mode!==0)return;
   playbackActive=true;setControlsLocked(true);const replay=host.querySelector('.mockup-replay');replay.hidden=true;
   try{
-    const [images]=await Promise.all([foldImagesPromise,new Promise(resolve=>setTimeout(resolve,delay))]);
+    const [images]=await Promise.all([loadFoldImages(),new Promise(resolve=>setTimeout(resolve,delay))]);
     const [base,rail,article,nav]=images;
     const canvas=document.createElement('canvas');canvas.width=1398;canvas.height=2034;
     const ctx=canvas.getContext('2d');ctx.scale(3,3);

@@ -7,11 +7,23 @@
   layer.setAttribute('aria-hidden', 'true');
   document.body.append(layer);
   let frame = 0;
+  const visible = new Set();
+  const visibility = "IntersectionObserver" in window ? new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      const box = pending.get(entry.target);
+      if (!box) continue;
+      if (entry.isIntersecting) visible.add(entry.target);
+      else { visible.delete(entry.target); box.hidden = true; }
+    }
+    schedule();
+  }, { rootMargin: "100px" }) : null;
 
   function layout() {
     frame = 0;
-    for (const [target, placeholder] of pending) {
-      if (!target.isConnected) { placeholder.remove(); pending.delete(target); continue; }
+    for (const target of visible) {
+      const placeholder = pending.get(target);
+      if (!placeholder) { visible.delete(target); continue; }
+      if (!target.isConnected) { placeholder.remove(); pending.delete(target); visible.delete(target); continue; }
       const r = target.getBoundingClientRect();
       let left = Math.max(0, r.left), top = Math.max(0, r.top);
       let right = Math.min(innerWidth, r.right), bottom = Math.min(innerHeight, r.bottom);
@@ -34,7 +46,8 @@
       const box = document.createElement('div');
       box.className = 'asset-placeholder';
       box.innerHTML = '<span class="asset-placeholder-spinner"></span><span class="asset-placeholder-label">正在加载…</span>';
-      layer.append(box); pending.set(target, box); resize.observe(target);
+      box.hidden = true; layer.append(box); pending.set(target, box); resize.observe(target);
+      if (visibility) visibility.observe(target); else visible.add(target);
     }
     schedule();
   }
@@ -45,7 +58,7 @@
       box.classList.add('asset-placeholder-error');
       box.querySelector('.asset-placeholder-label').textContent = '图片加载失败';
       schedule();
-    } else { resize.unobserve(target); box.remove(); pending.delete(target); }
+    } else { resize.unobserve(target); visibility?.unobserve(target); visible.delete(target); box.remove(); pending.delete(target); }
   }
   function waitImage(img) {
     const src = img.currentSrc || img.src;
@@ -75,11 +88,22 @@
     group.classList.add('asset-group-pending');
     show(group);
     const images = [...group.querySelectorAll('img')];
+    // 开始准备该动画时，立即加载其所有图层，避免个别懒加载图层卡住整组。
+    images.forEach(img => { img.loading = "eager"; });
     Promise.all(images.map(img => waitImage(img).then(() => { img.dataset.assetReady = ''; }))).then(() => {
       group.classList.remove('asset-group-pending'); finish(group, false);
     }, () => finish(group, true));
   }
-  document.querySelectorAll(groups).forEach(watchGroup);
+  const groupElements = document.querySelectorAll(groups);
+  groupElements.forEach(group => { group.classList.add('asset-group-pending'); show(group); });
+  if ('IntersectionObserver' in window) {
+    const groupLoader = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) {
+        groupLoader.unobserve(entry.target); watchGroup(entry.target);
+      }
+    }, { rootMargin: '800px' });
+    groupElements.forEach(group => groupLoader.observe(group));
+  } else groupElements.forEach(watchGroup);
   document.querySelectorAll('img').forEach(img => { if (!img.closest(groups)) watchImage(img); });
   new MutationObserver(records => {
     for (const record of records) {
