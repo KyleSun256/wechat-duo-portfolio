@@ -1,0 +1,112 @@
+/*
+ * 页面间距控制台
+ * 数值单位是 px。先改下方变量即可统一调整同一层级的间距。
+ * 修改后保存文件，在浏览器刷新即可预览。
+ */
+:root {
+  --space-page-top: 128px;       /* 封面结束到正文的距离 */
+  --space-page-bottom: 250px;   /* 正文末尾到页面底部的距离 */
+  --space-section: 128px;       /* 正文一级模块之间 */
+  --space-subsection: 80px;     /* 同一方案内的不同内容块 */
+  --space-content: 64px;        /* 标题组、说明组、演示区之间 */
+  --space-group: 36px;          /* 标题与说明、说明与图片之间 */
+  --space-related: 24px;        /* 关联卡片、段落之间 */
+  --space-caption: 12px;        /* 图片与图注之间 */
+  --space-label: 8px;           /* 小标题与正文、标签之间 */
+}
+
+/* 一级模块：角色、内屏布局、使用路径、内容生态、三个设计方案。 */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+  margin-top: var(--space-page-top);
+  margin-bottom: var(--space-page-bottom);
+}
+main > .explorer,
+main > .duo-layout-intro,
+main > .duo-paths,
+main > .content-ecosystem { margin-top: 0; }
+main > .adaptation,
+main > .split-design,
+main > .hierarchy-design { padding-block: 0; }
+
+/* 概念解释与任务关系。 */
+.principles { margin-top: var(--space-content); gap: var(--space-related); }
+.diagram { margin-top: var(--space-related); }
+.relation-row { margin-top: var(--space-subsection); }
+.relation-narrative { margin-top: var(--space-subsection); gap: var(--space-related); color: #6c6c6d; }
+.relation-narrative strong { color: #1d1d1f; }
+
+/* 内屏介绍与内容类型。 */
+.duo-layout-intro, .duo-paths { gap: var(--space-content); }
+.duo-section-heading { gap: var(--space-group); }
+.content-intro { margin-top: var(--space-group); }
+.content-types { margin-top: var(--space-content); }
+.content-scroll { margin-top: var(--space-related); }
+.path-card { gap: var(--space-related); }
+.path-copy h3 { margin-bottom: var(--space-caption); }
+
+/* 设计方案：方案大块、子方案、图文和图注。 */
+.adaptation, .hierarchy-design { gap: var(--space-content); }
+.split-design { gap: var(--space-subsection); }
+.split-intro, .split-solution, .collab-solution { gap: var(--space-content); }
+.adaptation-header, .split-description { gap: var(--space-related); }
+.adaptation-detail, .floating-position, .rules-block, .context-inner { gap: var(--space-group); }
+.adaptation-gallery { gap: var(--space-related); }
+.adaptation-gallery figcaption, .rules-carousel figure { gap: var(--space-caption); }
+.adaptation-gallery figcaption { margin-top: var(--space-caption); }
+.rules-section { gap: var(--space-subsection); padding-block: var(--space-content); }
+.rules-combinations { gap: var(--space-content); }
+.context-section { padding-block: var(--space-content); }
+.context-comparison { gap: var(--space-related); }
+.context-comparison figcaption { margin-top: var(--space-caption); }
+.hierarchy-copy, .hierarchy-demo { gap: var(--space-group); }
+.hierarchy-rules { gap: var(--space-related); }
+
+/* 小屏单独调整：变量会自动作用于上面的全部模块。 */
+@media (max-width: 760px) {
+  :root {
+    --space-page-top: 80px;
+    --space-page-bottom: 80px;
+    --space-section: 80px;
+    --space-subsection: 56px;
+    --space-content: 48px;
+    --space-group: 28px;
+    --space-related: 24px;
+  }
+  .hierarchy-rules { gap: var(--space-caption); }
+}
+
+/* 收尾模块：图片位置按照 Figma 画板同比缩放。 */
+.page-ending { display:flex; flex-direction:column; gap:36px; }
+.page-ending-title { display:flex; align-items:center; gap:24px; color:#6c6c6d; font-size:20px; line-height:1.5; text-align:center; white-space:nowrap; }
+.page-ending-title::before, .page-ending-title::after { content:""; flex:1; min-width:1px; height:1px; background:#cececf; }
+.page-ending-art { width:100%; aspect-ratio:1200/694; overflow:hidden; background:#fafafa; }
+.page-ending-canvas { position:relative; width:100%; aspect-ratio:1200/1500; overflow:hidden; }
+.ending-layer { position:absolute; display:flex; align-items:center; justify-content:center; }
+.ending-layer>div { flex:none; position:relative; }
+.ending-layer img, .ending-phone { display:block; width:100%; height:100%; max-width:none; }
+.ending-left-screen { left:-28.8333%; top:26.6667%; width:75.3713%; height:70.6735%; }
+.ending-left-screen>div { width:105.146%; height:72.281%; transform:rotate(-18deg) skewX(-18deg) scaleY(.95); mask-image:url('assets/footer/mask-left.svg'); mask-mode:alpha; mask-repeat:no-repeat; mask-position:102.96% 41.47%; mask-size:50.263% 139.978%; }
+.ending-right-screen { left:53.4583%; top:5.1%; width:42.0963%; height:62.3535%; }
+.ending-right-screen>div { width:104.569%; height:83.485%; transform:rotate(17deg) skewX(17deg) scaleY(.96); mask-image:url('assets/footer/mask-right.svg'); mask-mode:alpha; mask-repeat:no-repeat; mask-position:-9.464% 11.27%; mask-size:77.994% 119.373%; }
+.ending-front-screen { left:11.0833%; top:35.9333%; width:33.5786%; height:60.241%; }
+.ending-front-screen>div { width:105.146%; height:85.509%; transform:rotate(18deg) skewX(18deg) scaleY(.95); overflow:hidden; border-radius:0 30px 30px 30px; }
+.ending-phone { position:absolute; object-fit:cover; }
+.ending-phone-left { left:10.1665%; top:25.2%; width:37.646%; height:70.8268%; }
+.ending-phone-right { right:10.1167%; top:4%; width:37.8%; height:70.5187%; }
+@media(max-width:760px) { .page-ending { gap:var(--space-group); } .page-ending-title { font-size:16px; gap:16px; } }
+/* 页尾图片本身到达页面底边，避免在图片下方额外留白。 */
+main:has(.page-ending) { margin-bottom:0; }
+.ending-left-screen { clip-path:inset(0 0 0 53.85%); }
+
+/* 方案 2.1 的过程复盘 */
+.split-reflection { display:flex; flex-direction:column; gap:12px; }
+.split-reflection strong { font-weight:600; }
+
+/* 方案 2.2 右侧示例：屏幕与设备外框使用设计稿中的位置。 */
+.collab-gallery .collab-stage-example .collab-example-screen { left:113px; top:46px; }
+.collab-gallery .collab-stage-example .collab-frame { left:103px; top:35px; }
+
+.page-ending-image { display: block; width: 100%; height: auto; }

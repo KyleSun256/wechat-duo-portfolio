@@ -1,1 +1,995 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>微信多任务体验设计</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="mockup.css"></head><body><header class="cover" aria-label="项目介绍"><div class="cover-inner"><div class="cover-heading"><img src="assets/cover-wechat.png" width="84" height="84" alt=""><p>iPhone Duo 上的微信<br>多任务体验设计</p></div><img class="cover-art" src="assets/cover-art.png" width="1200" height="800" alt="iPhone Duo 与微信界面的项目封面"><div class="cover-meta"><div class="cover-meta-item"><img src="assets/cover-calendar.png" width="64" height="64" alt=""><div><h2>完成时间</h2><p>2026年11月19日～2026年11月22日<br>（4天）</p></div></div><div class="cover-meta-item"><img src="assets/cover-tools.png" width="176" height="64" alt="Figma、Photoshop 等设计工具"><h2>设计工具</h2></div></div></div></header><main><section class="intro"><h1>什么是多任务</h1><p class="definition"><strong>多任务是用户目标之间的关系</strong>。指用户在一条连续的使用过程中，需要处理两项或<strong>多项目标</strong>，并且希望在切换、并行或中断后，能够保留必要的<strong>上下文</strong>。</p><div class="principles"><article><h2><img class="heading-icon" src="assets/goals.svg" alt="">多项用户目标</h2><p>用户在一条连续的使用过程中，需要处理两项或多项目标，并希望在切换、并行或中断后，保留必要的上下文。</p></article><article><h2><img class="heading-icon" src="assets/context.svg" alt="">连续上下文</h2><p>用户在一条连续的使用过程中，需要处理两项或多项目标，并希望在切换、并行或中断后，保留必要的上下文。</p></article></div></section><section class="explorer"><h2><img class="heading-icon" src="assets/roles.svg" alt="">任务的角色</h2><p class="subtitle">角色不是由任务内容类型决定的，同一项任务的角色会随时变化。</p><div class="diagram"><div class="role-scroll" tabindex="0" aria-label="任务角色，左右滚动查看更多"><div class="roles"></div></div><svg class="connections" aria-hidden="true"></svg><div class="relation-row"><div class="relation-heading"><img src="assets/relationship-heading.svg" alt=""><span>任务关系</span></div><div class="relation-scroll" tabindex="0" aria-label="横向滚动查看更多任务关系"><div class="relations" aria-label="选择任务关系"></div></div></div></div><div class="relation-narrative"><p>微信在直板iPhone上的浮层功能已经具备了多任务<strong>核心基础场景</strong> (中断/恢复) 的用户体验链路，并通过小窗的形式提供了<strong>支撑能力</strong> (任务管理) ，满足用户的多任务需求。</p><p>在iPhone Duo上使用微信多任务功能，“折叠屏”属性带来的<strong>新体验问题</strong>是：如何帮助用户理解什么时候值得主动展开屏幕？如何以更符合直觉的方式向用户传达任务分屏规则？如何处理更高可用空间带来的更多信息层级？</p><div class="relation-goals"><p>本题的目标是针对多任务体验链路中的<strong>P0级任务关系情景</strong>进行折叠屏体验优化，实现：</p><ul><li><span>规范性</span><p>通过<strong>基础适配设计</strong>提升核心基础场景和支撑能力的体验；</p></li><li><span>创新性</span><p>通过<strong>优化分屏设计</strong>围绕机会场景拓展内屏功能；</p></li><li><span>逻辑性</span><p>通过<strong>视图层级设计</strong>实现内外屏切换的无缝衔接体验。</p></li></ul></div></div></section><section class="duo-layout-intro" aria-labelledby="duo-layout-title"><div class="duo-section-heading"><h2 id="duo-layout-title">iPhone Duo分体式布局<br>带来的信息结构变化</h2><p>iPhone Duo 展开后，微信可以利用更大的内屏，将原本需要逐层进入、返回或通过浮窗切换的内容，同时组织在相邻的两个面板中。这也带来了本次设计的最大机会点。参考 Apple 对分栏布局和信息层级的指导，本方案将<strong>会话相关内容保留在左侧作为持续上下文</strong>，在右侧提供打开与之相关的图片、文件、小程序、媒体或网页的能力。</p></div><img class="duo-layout-visual" src="assets/layout-pane-diagram.png" width="1200" height="500" alt="iPhone Duo 内屏左右面板的信息结构示意图" loading="lazy"></section><section class="duo-paths" aria-labelledby="duo-path-title"><div class="duo-section-heading"><h2 id="duo-path-title">iPhone Duo内屏<br>在微信场景下的两条核心使用路径</h2><div class="duo-path-intro"><p>内屏为微信提供了同时展示两个页面的空间。用户既可能沿着原有路径逐层进入会话和内容，也可能希望保留一项内容，在查看内容与处理聊天之间交替操作。基于这两种不同的任务关系，方案将内屏体验归纳为「分屏递进」与「分屏交替并行」，并进一步结合微信内容类型，判断组合场景。</p><p><strong>* 分屏递进本身不一定是多任务</strong>，但它是多任务体验相干涉的结构基础，需要与多任务场景同步优化。</p></div></div><div class="adaptation-gallery path-gallery" tabindex="0" aria-label="左右滚动查看内屏使用路径"><article class="path-card"><div class="path-copy"><h3>分屏递进</h3><p><strong>用户意图：浏览、找到并查看具体内容。</strong><br>用户沿着同一条任务路径逐层深入。通常情况下，内屏需保留聊天列表，并展示当前会话或进一步打开的最高层级的内容，并保留逐层返回关系。</p></div><img src="assets/path-progressive.png" width="384" height="384" alt="分屏递进路径示意" loading="lazy"></article><article class="path-card"><div class="path-copy"><h3>分屏交替并行</h3><p><strong>用户意图：围绕同一目标，在任务间反复参考或操作。</strong><br>用户需要持续关注聊天和关联内容，在两者之间反复查看、确认或操作。重点是需要减少寻找和往返的负担，同时保留双方的任务进度。</p></div><img src="assets/path-parallel.png" width="384" height="384" alt="分屏交替并行路径示意" loading="lazy"></article><article class="path-card"><div class="path-copy"><h3>路径衔接</h3><p><strong>同一次使用场景中的路径可发生转变</strong><br>用户的路径会随任务目标变化：有时只需逐层查看并返回，有时则需要让聊天与内容持续配合。不同内容的操作方式和状态层级会影响任务间配合的体验。</p></div><img src="assets/path-transition.png" width="384" height="384" alt="两种使用路径衔接示意" loading="lazy"></article></div></section><section class="content-ecosystem"><h2>聚焦微信内容生态，<br>提炼核心多任务需求场景。</h2><p class="content-intro"><strong>面对不同的内容类型，用户对其并行使用的期待不同</strong>。整理了微信中常见的内容类型，并对其具有的上下文进行梳理。</p><div class="content-types"><h3><img src="assets/content-heading.svg" alt="">微信内常见内容类型</h3><div class="content-scroll" tabindex="0" aria-label="横向滚动查看更多内容类型"><div class="content-cards"><div class="content-card" tabindex="0"><img src="assets/content-0.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户围绕内容与他人交流、确认或反馈，需要在查看信息后继续回复。</span><span class="content-card-label">聊天会话</span></div><div class="content-card" tabindex="0"><img src="assets/content-1.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户查看对方发送的材料，并结合细节提出问题、解释或反馈。</span><span class="content-card-label">图片/文件</span></div><div class="content-card" tabindex="0"><img src="assets/content-2.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户一边与他人商量，一边查询、选择或填写信息。</span><span class="content-card-label">小程序</span></div><div class="content-card" tabindex="0"><img src="assets/content-3.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户观看或收听内容，同时处理消息，或与他人讨论内容。</span><span class="content-card-label">视频号等媒体内容</span></div><div class="content-card" tabindex="0"><img src="assets/content-4.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户从消息中进入文章，阅读后返回，或参考文章内容继续讨论。</span><span class="content-card-label">公众号/服务号内容</span></div><div class="content-card" tabindex="0"><img src="assets/content-5.png" alt=""><span class="content-card-overlay"></span><span class="content-card-description">用户打开链接查找信息，并将查到的内容用于回复或决策。</span><span class="content-card-label">网页/H5等</span></div></div></div></div></section><section class="adaptation" aria-labelledby="adaptation-title"><header class="adaptation-header"><span class="adaptation-kicker">设计方案 Part 1</span><h2 id="adaptation-title">基础适配设计<br>提升多任务基础场景和支撑能力体验</h2></header><dl class="adaptation-summary"><div><dt>核心目标</dt><dd>依照 iPhone Duo 设计规范适配控件，优化现有浮窗功能在折叠屏上的体验</dd></div><div><dt>代表任务关系 (示例场景)</dt><dd>中断与恢复 (聊天与文章阅读)</dd></div></dl><div class="adaptation-detail"><div class="adaptation-copy"><h3>独立的浮窗入口</h3><p>直板机中，浮窗的入口设计为不干扰界面的竖条，用户可自定义浮窗入口和展开位置。我认为这是由于在直板机的比例限制下（屏幕水平方空间为紧凑布局，纵向为无限延伸的信息内容）而做出的平衡取舍。在iPhone Duo中，水平空间增大，右侧先天让出了控制区，因此浮窗不必挤占内容的横向空间。这也降低了右侧控制栏与内容之间的“界限”要求。</p></div><div class="adaptation-gallery" tabindex="0" aria-label="左右滚动查看浮窗入口示意图"><figure><img src="assets/adaptation-folded-updated.png" width="792" height="490" alt="折叠态下微信首页的浮窗入口示意"><figcaption>折叠态示意</figcaption></figure><figure class="adaptation-open"><img src="assets/adaptation-open.png" width="792" height="490" alt="展开态下微信首页的浮窗入口示意"><figcaption>展开态示意</figcaption></figure></div></div><div class="floating-position"><div class="adaptation-copy"><h3>保留浮窗展开位置自定义能力</h3><p>原浮窗入口的位置是自由的，这样可以为用户提供更多自定义场景，方便浮窗展开后与底层界面内容之间的位置关系协调无遮挡。虽然浮窗入口是相对固定的，但展开后的浮窗面板仍旧可以保留这一自由度，记忆上一次浮窗面板的展开位置 (纵向位置)。</p></div><div class="adaptation-gallery floating-gallery" tabindex="0" aria-label="左右滚动查看浮窗位置示意"><figure><div class="floating-frame animation-awaiting-visibility" aria-label="浮窗面板上下移动，展示可自定义高度"><div class="floating-canvas"><div class="floating-backdrop"></div><div class="floating-movement"><div class="floating-items"><img class="floating-items-image" src="assets/float-movement-2x.png" alt=""></div><div class="floating-handle-container"><div class="floating-handle"></div></div></div><div class="floating-guides"><img src="assets/float-guide.svg" alt=""><img src="assets/float-guide.svg" alt=""><img src="assets/float-guide.svg" alt=""></div><div class="floating-fade-right"></div><div class="floating-fade-left"></div><div class="floating-rail-bottom"></div><div class="floating-rail-top"></div></div></div><figcaption>示意-自定义浮窗展开的高度位置</figcaption></figure><figure class="floating-static"><img src="assets/float-position-folded-updated.png" width="792" height="490" alt="折叠态下展开浮窗的示意图"><figcaption>折叠态示意</figcaption></figure></div></div></section><section class="split-design" aria-labelledby="split-title"><div class="split-intro"><header class="adaptation-header"><span class="adaptation-kicker">设计方案 Part 2</span><h2 id="split-title">内屏多任务分屏设计<br>围绕关联任务场景拓展并行能力</h2></header><dl class="adaptation-summary"><div><dt>核心目标</dt><dd>允许某些内容在内屏中进行组合，并不干扰原有层级的递进关系</dd></div><div><dt>代表任务关系 (示例场景)</dt><dd>交替参考/并行协作 (与朋友商量行程，同时在小程序中查询)</dd></div></dl><p class="split-copy">在中断与恢复场景中，打断用户的信息通常只需被处理一次，该信息通常与用户当前正在浏览的内容没有关联。这种情况下，常规的浮层逻辑已经足够，用户可能无需展开屏幕即可完成需求的处理。但当用户需要反复查看或持续操作多项任务时，内屏应当及时发挥其可用空间优势，通过同时展示多条任务线的内容缩短用户路径。</p></div><div class="split-solution"><div class="split-description"><h3>方案2.1: 通过“保留”固定分屏内容</h3><p class="split-copy">双面板默认保持递进关系：用户在左侧选择内容，右侧展示对应页面。当用户希望保留正在查看的内容，同时处理其他会话时，点击交界处可将右侧内容保留；此后左侧继续导航，右侧保持不变。当新内容需要占用已固定的右侧，用户可先临时查看，或主动将原内容暂存后替换。这样，用户无需预先判断面板之间的复杂状态，也能明确控制当前任务是否被保留。</p></div><div class="adaptation-gallery split-gallery" tabindex="0" aria-label="左右滚动查看分屏保留状态示意"><div class="split-selector"><img id="split-diagram" src="assets/split-diagram-keep.png" width="384" height="420" alt="保留状态的起始面板和尾侧面板示意"><div class="split-controls" role="group" aria-label="选择分屏保留状态"><button type="button" data-split-state="keep" aria-pressed="true">保留</button><button type="button" data-split-state="free" aria-pressed="false">不保留</button><button type="button" data-split-state="unavailable" aria-pressed="false">不可保留</button></div></div><img class="split-device" id="split-device" src="assets/split-screen-keep.png" width="792" height="490" alt="保留状态的内屏多任务示意"></div></div><div class="collab-solution"><div class="split-description"><h3>方案2.2: 以浮窗为核心的双面板协作</h3><p class="split-copy">默认状态下，左侧展示聊天列表，右侧按微信原有层级逐步打开会话、文章或其他内容。当用户需要同时处理两项任务时，可将内容加入浮窗并在右侧展开；此时左侧允许进入聊天内容页，两侧暂时独立。当用户从左侧打开新的内容时，右侧浮窗自动回收，界面回到默认结构，用户仍可通过浮窗恢复原任务。该方案平衡了微信已有的浮窗心智，建立单任务浏览与双任务并行之间的转换，通过浮窗中转消解了上一方案带来的固定态复杂性问题。</p></div><div class="adaptation-gallery collab-gallery" tabindex="0" aria-label="左右滚动查看双面板协作示意"><figure><div class="collab-stage animation-awaiting-visibility" aria-label="将浮窗任务拖入视窗的动画"><div class="collab-stage-canvas"><div class="collab-screen-window"><div class="collab-animation"><img class="collab-background" src="assets/collab-background.png" alt=""><div class="collab-shade"></div><div class="collab-target-position"><div class="collab-target"></div></div><div class="collab-cards"><div class="collab-card collab-card-0"><img src="assets/collab-card-0.svg" alt=""></div><div class="collab-card collab-card-1"><img src="assets/collab-card-1.svg" alt=""></div><div class="collab-card collab-card-2"><img src="assets/collab-card-2.svg" alt=""></div><div class="collab-card collab-card-3"><img src="assets/collab-card-3.svg" alt=""></div><div class="collab-card collab-card-4"><img src="assets/collab-card-4.svg" alt=""></div><div class="collab-handle"></div></div></div></div><div class="collab-device-border"></div><img class="collab-frame" src="assets/collab-frame.svg" alt=""></div></div><figcaption>从浮窗中拖入任务至视窗</figcaption></figure><figure><img src="assets/collab-example-updated.png" width="792" height="490" alt="会话与任务组合的内屏示意"><figcaption>示例：会话+任务组合形式</figcaption></figure></div></div><section class="rules-section" aria-label="分屏规则取舍"><div class="rules-intro"><h3>规则取舍：仅允许浮窗任务与聊天独立并行</h3><p>本方案优先支持相对独立的任务并行。借助微信已有的浮窗心智，用户可以建立单任务浏览与双任务并行之间的转换，同时保持多任务逻辑清晰，可随时在多任务并行-单任务递进的模式下转化。</p></div><div class="rules-block"><div class="rules-copy"><h4>默认状态：保留原有递进导航关系</h4><p>默认状态下，左侧固定展示聊天列表，右侧展示用户选中的会话，并承载从会话或公众号 / 服务号消息聚合页中继续打开的内容。用户可通过右侧返回操作回到上一页面，保持原有的逐层浏览路径。</p></div><div class="rules-stage rules-stage-default animation-awaiting-visibility" aria-label="默认状态下的递进导航演示"><div class="rules-canvas"><div class="rules-screen rules-screen-default"><img class="rules-image r81" src="assets/rules-81.png" alt=""><div class="rules-dim-default"></div><img class="rules-image r83" src="assets/rules-83.png" alt=""><img class="rules-image r84" src="assets/rules-84.png" alt=""><img class="rules-image r85" src="assets/rules-85.png" alt=""></div><div class="rules-device-border rules-device-border-default"></div><img class="rules-device-frame rules-device-frame-default" src="assets/collab-frame.svg" alt=""></div></div></div><div class="rules-block"><div class="rules-copy"><h4>浮窗并行：仅允许「聊天 + 内容」并行</h4><p>当用户需要一边聊天、一边查看或操作另一项内容时，可将内容加入浮窗并在右侧展开。此时左侧允许进入具体聊天会话，形成「左侧聊天 + 右侧浮窗内容」的并行布局。两侧暂时独立：左侧切换会话时，右侧浮窗内容保持不变；若用户从左侧聊天打开新内容，原浮窗收回，界面恢复默认递进结构。</p></div><div class="rules-carousel" tabindex="0" aria-label="左右滚动查看浮窗并行演示"><div class="rules-carousel-track"><figure><div class="rules-stage animation-awaiting-visibility" aria-label="聊天与内容并行演示"><div class="rules-canvas"><div class="rules-screen rules-screen-first"><img class="rules-image r79" src="assets/rules-79.png" alt=""><img class="rules-image r87" src="assets/rules-87.png" alt=""><img class="rules-image r97" src="assets/rules-97.png" alt=""><img class="rules-image r88" src="assets/rules-88.png" alt=""><div class="rules-dim-first"></div><div class="rules-slide-mask"><img class="rules-image r86" src="assets/rules-86.png" alt=""></div></div><div class="rules-device-border"></div><img class="rules-device-frame" src="assets/collab-frame.svg" alt=""></div></div><figcaption>聊天是微信用户的核心场景。用户打开文章、图片、文件或小程序内容后，可能仍需要回看消息、与对方讨论，或将操作结果反馈给对方。此时，聊天与内容分别承担交流和查看的任务，构成了交替并行的场景。</figcaption></figure><figure><div class="rules-stage animation-awaiting-visibility" aria-label="公众号聚合页与文章的递进导航演示"><div class="rules-canvas"><div class="rules-screen rules-screen-second"><img class="rules-image r96" src="assets/rules-96.png" alt=""><img class="rules-image r90" src="assets/rules-90.png" alt=""><div class="rules-second-bg"></div><div class="rules-second-mask"><img class="rules-image r94" src="assets/rules-94.png" alt=""></div><img class="rules-image r91" src="assets/rules-91.png" alt=""><img class="rules-image r95" src="assets/rules-95.png" alt=""></div><div class="rules-device-border"></div><img class="rules-device-frame" src="assets/collab-frame.svg" alt=""></div></div><figcaption>相比之下，公众号消息聚合页与文章主要构成“选择内容—阅读内容”的导航关系。本方案认为，用户阅读时不一定需要持续操作聚合页，因此聚合页将替代被打开的浮窗，浮窗回收。若要支持在左侧连续选择文章、让右侧同步切换，需额外建立一套面板联动和退出的规则。因此，本方案优先保留聚合页到文章的逐层导航，将独立并行聚焦于<strong>聊天 + 内容</strong>。</figcaption></figure></div></div></div><div class="rules-combinations"><div class="combinations-intro"><h4>多任务组合规则</h4><p>两侧不同时展示同类内容，例如不同时展示两个具体聊天会话。该规则用于保持面板分工清楚，减少用户对当前操作对象的混淆。全部规则匹配情况见下表。</p></div><div class="combinations-allowed"><h5>面板中允许展示的内容</h5><dl><div><dt>Leading Pane</dt><dd>聊天列表；聊天会话内容 (一定条件下允许)</dd></div><div><dt>Trailing Pane</dt><dd>聊天会话内容；图片/文件；公众号/服务号文章；小程序；网页/H5</dd></div></dl></div><div class="combinations-matrix"><h5>组合匹配规则</h5><div class="matrix-scroll" tabindex="0" role="region" aria-label="横向滚动查看全部组合匹配规则"><div class="matrix-content"><div class="matrix-header"><div class="matrix-axis"><div><img src="assets/matrix-trailing.svg" alt=""><strong>Trailing<br>Pane</strong></div><div><img src="assets/matrix-leading.svg" alt=""><strong>Leading<br>Pane</strong></div></div><div class="matrix-cards"><div class="matrix-card"><img src="assets/content-0.png" alt=""><span>聊天会话</span></div><div class="matrix-card"><img src="assets/content-1.png" alt=""><span>图片/文件</span></div><div class="matrix-card"><img src="assets/content-2.png" alt=""><span>小程序</span></div><div class="matrix-card"><img src="assets/content-3.png" alt=""><span>视频号等媒体内容</span></div><div class="matrix-card"><img src="assets/content-4.png" alt=""><span>公众号/服务号内容</span></div><div class="matrix-card"><img src="assets/content-5.png" alt=""><span>网页/H5等</span></div></div></div><div class="matrix-table"><div class="matrix-row-labels"><strong>聊天列表页</strong><strong>聊天会话页</strong></div><div class="matrix-rows"><div class="matrix-row"><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>默认递进</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>递进或浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>递进或浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-unknown.svg" alt=""><span>媒体具有特殊性，本方案暂不讨论</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>递进或浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>递进或浮窗</span></div></div><div class="matrix-row"><div class="matrix-cell"><span class="matrix-cross" aria-hidden="true">×</span><span>不允许同类出现</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>仅限浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>仅限浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-unknown.svg" alt=""><span>媒体具有特殊性，本方案暂不讨论</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>仅限浮窗</span></div><div class="matrix-cell"><img src="assets/matrix-yes.svg" alt=""><span>仅限浮窗</span></div></div></div></div></div></div></div></div></section><section class="context-section" aria-labelledby="context-title"><div class="context-inner"><div class="context-copy"><h3 id="context-title">不携带上下文的浮窗：通过设计区分内容来源</h3><p>多任务目标下，用户可通过浮窗打开一些本不属于当前任务流程的内容。因此，<strong>左右面板的内容之间不一定存在连续性</strong>。例如，对于右侧为“公众号文章”的情景，文章可以由用户从公众号中打开 (递进)，可以是来自好友聊天中的分享 (递进)，也可以由用户从浮窗独立打开。由于浮窗不携带上下文 (内容来源)，有必要做出一定视觉元素的区隔，使用户得以获悉当前的左右内容是否上下文连续。</p></div><div class="context-comparison"><figure><img src="assets/context-independent.png" width="384" height="384" alt="通过浮窗打开文章，左右面板之间使用视觉分隔"><figcaption>通过浮窗打开-左右面板无上下文连接</figcaption></figure><figure><img src="assets/context-continuous.png" width="384" height="384" alt="连续递进打开文章，左右面板保持上下文连接"><figcaption>连续递进-左右面板有上下文连接</figcaption></figure></div></div></section></section><section class="hierarchy-design" aria-labelledby="hierarchy-title"><header class="adaptation-header"><span class="adaptation-kicker">设计方案 Part 3</span><h2 id="hierarchy-title">视图层级设计<br>实现内外屏切换的无缝衔接体验</h2></header><dl class="adaptation-summary"><div><dt>核心目标</dt><dd>在可用空间发生变化时重新组织视图的显示，并保留任务路径，让用户理解信息层级关系。</dd></div><div><dt>代表任务关系 (典型场景)</dt><dd>全部任务关系</dd></div></dl><div class="hierarchy-copy"><p>微信中的多任务往往不会随着设备开合而结束。当用户在内屏中同时处理聊天与内容，或沿着消息路径逐层浏览时，合屏会改变可用空间，也会改变当前可见的页面。为此，方案通过明确多任务场景下的视图层级与状态转换规则，决定空间变化时的页面层级展示逻辑。</p><p>* 由于本题聚焦多任务场景，且内外屏切换的体验在分屏递进与分屏交替并行之间并无显著可预见的冲突，因此下述内容只包含分屏交替并行场景。</p></div><div class="hierarchy-demo"><div class="hierarchy-rules" role="group" aria-label="选择视图层级规则"><button type="button" data-rule="1" aria-pressed="true"><strong>规则一：折叠后优先保留浮窗内容</strong><span>当用户在内屏展开浮窗内容，且尚未在另一侧进入具体聊天时，合屏后优先在外屏延续该内容。用户可以继续阅读或操作，保留了原有的浮窗逻辑。</span></button><button type="button" data-rule="2" aria-pressed="false"><strong>规则二：交替并行场景下，优先保留操作中的内容</strong><span>当聊天与浮窗内容同时展示且正在交流时，合屏后优先延续用户当前正在操作的任务，另一项任务暂时退出屏幕，但保留其状态和恢复路径。</span></button><button type="button" data-rule="3" aria-pressed="false"><strong>规则三：适应可用空间宽度变化，避开弯折处</strong><span>当设备开合、部分折叠或微信窗口宽度变化时，根据实际可用空间调整面板布局。设备半折时，浮窗内容和组件避开中央弯折区域，减少遮挡与误触。</span></button></div><section id="duo-demo" aria-label="可折叠设备演示"></section></div></section></main><script type="module" src="main.js"></script><script src="vendor/apple-duo/runtime.js"></script><script type="module" src="mockup.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>微信多任务体验设计</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="mockup.css" />
+    <link rel="stylesheet" href="spacing.css" />
+  </head>
+  <body>
+    <header class="cover" aria-label="项目介绍">
+      <div class="cover-inner">
+        <div class="cover-heading">
+          <img src="assets/cover-wechat.png" width="84" height="84" alt="" />
+          <p>iPhone Duo 上的微信<br />多任务体验设计</p>
+        </div>
+        <img
+          class="cover-art"
+          src="assets/cover-art.png"
+          width="1200"
+          height="800"
+          alt="iPhone Duo 与微信界面的项目封面"
+        />
+        <div class="cover-meta">
+          <div class="cover-meta-item">
+            <img
+              src="assets/cover-calendar.png"
+              width="64"
+              height="64"
+              alt=""
+            />
+            <div>
+              <h2>完成时间</h2>
+              <p>2026年11月19日～2026年11月22日<br />（4天）</p>
+            </div>
+          </div>
+          <div class="cover-meta-item">
+            <img
+              src="assets/cover-tools.png"
+              width="176"
+              height="64"
+              alt="Figma、Photoshop 等设计工具"
+            />
+            <h2>设计工具</h2>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section class="intro">
+        <h1>什么是多任务</h1>
+        <p class="definition">
+          <strong>多任务是用户目标之间的关系</strong
+          >。指用户在一条连续的使用过程中，需要处理两项或<strong>多项目标</strong>，并且希望在切换、并行或中断后，能够保留必要的<strong>上下文</strong>。
+        </p>
+        <div class="principles">
+          <article>
+            <h2>
+              <img
+                class="heading-icon"
+                src="assets/goals.svg"
+                alt=""
+              />多项用户目标
+            </h2>
+            <p>
+              多项用户目标之间可能包含不同的协作关系。设计中需要关注用户为什么有必要在任务间切换或配合，并根据任务关系组织页面。
+          </article>
+          <article>
+            <h2>
+              <img
+                class="heading-icon"
+                src="assets/context.svg"
+                alt=""
+              />连续上下文
+            </h2>
+            <p>
+              上下文是用户在切换任务、收起浮窗或开合设备后理解自己当前操作状态的必要内容。设计中需要关注任务在浮窗、内屏、外屏之间的接力方式，并依据任务上下文特征权衡信息保留。
+        </div>
+      </section>
+      <section class="explorer">
+        <h2>
+          <img class="heading-icon" src="assets/roles.svg" alt="" />任务的角色
+        </h2>
+        <p class="subtitle">
+          角色不是由任务内容类型决定的，同一项任务的角色会随时变化。
+        </p>
+        <div class="diagram">
+          <div
+            class="role-scroll"
+            tabindex="0"
+            aria-label="任务角色，左右滚动查看更多"
+          >
+            <div class="roles"></div>
+          </div>
+          <svg class="connections" aria-hidden="true"></svg>
+          <div class="relation-row">
+            <div class="relation-heading">
+              <img src="assets/relationship-heading.svg" alt="" /><span
+                >任务关系</span
+              >
+            </div>
+            <div
+              class="relation-scroll"
+              tabindex="0"
+              aria-label="横向滚动查看更多任务关系"
+            >
+              <div class="relations" aria-label="选择任务关系"></div>
+            </div>
+          </div>
+        </div>
+        <div class="relation-narrative">
+          <p>
+            微信在直板iPhone上的浮层功能已经具备了多任务<strong
+              >核心基础场景</strong
+            >
+            (中断/恢复) 的用户体验链路，并通过小窗的形式提供了<strong
+              >支撑能力</strong
+            >
+            (任务管理) ，满足用户的多任务需求。
+          </p>
+          <p>
+            在iPhone
+            Duo上使用微信多任务功能，“折叠屏”属性带来的<strong>新体验问题</strong>是：如何帮助用户理解什么时候值得主动展开屏幕？如何以更符合直觉的方式向用户传达任务分屏规则？如何处理更高可用空间带来的更多信息层级？
+          </p>
+          <div class="relation-goals">
+            <p>
+              本题的目标是针对多任务体验链路中的<strong>P0级任务关系情景</strong>进行折叠屏体验优化，实现：
+            </p>
+            <ul>
+              <li>
+                <span>规范性</span>
+                <p>
+                  通过<strong>基础适配设计</strong>提升核心基础场景和支撑能力的体验；
+                </p>
+              </li>
+              <li>
+                <span>创新性</span>
+                <p>
+                  通过<strong>优化分屏设计</strong>围绕机会场景拓展内屏功能；
+                </p>
+              </li>
+              <li>
+                <span>逻辑性</span>
+                <p>
+                  通过<strong>视图层级设计</strong>实现内外屏切换的无缝衔接体验。
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section class="duo-layout-intro" aria-labelledby="duo-layout-title">
+        <div class="duo-section-heading">
+          <h2 id="duo-layout-title">
+            iPhone Duo分体式布局<br />带来的信息结构变化
+          </h2>
+          <p>
+            iPhone Duo
+            展开后，微信可以利用更大的内屏，将原本需要逐层进入、返回或通过浮窗切换的内容，同时组织在相邻的两个面板中。这也带来了本次设计的最大机会点。参考
+            Apple
+            对分栏布局和信息层级的指导，本方案将<strong>会话相关内容保留在左侧作为持续上下文</strong>，在右侧提供打开与之相关的图片、文件、小程序、媒体或网页的能力。
+          </p>
+        </div>
+        <img
+          class="duo-layout-visual"
+          src="assets/layout-pane-diagram.png"
+          width="1200"
+          height="500"
+          alt="iPhone Duo 内屏左右面板的信息结构示意图"
+          loading="lazy"
+        />
+      </section>
+      <section class="duo-paths" aria-labelledby="duo-path-title">
+        <div class="duo-section-heading">
+          <h2 id="duo-path-title">
+            iPhone Duo内屏<br />在微信场景下的两条核心使用路径
+          </h2>
+          <div class="duo-path-intro">
+            <p>
+              内屏为微信提供了同时展示两个页面的空间。用户既可能沿着原有路径逐层进入会话和内容，也可能希望保留一项内容，在查看内容与处理聊天之间交替操作。基于这两种不同的任务关系，方案将内屏体验归纳为「分屏递进」与「分屏交替并行」，并进一步结合微信内容类型，判断组合场景。
+            </p>
+            <p>
+              <strong>* 分屏递进本身不一定是多任务</strong
+              >，但它是与多任务体验相干涉的结构基础，需要与多任务场景同步优化。
+            </p>
+          </div>
+        </div>
+        <div
+          class="adaptation-gallery path-gallery"
+          tabindex="0"
+          aria-label="左右滚动查看内屏使用路径"
+        >
+          <article class="path-card">
+            <div class="path-copy">
+              <h3>分屏递进</h3>
+              <p>
+                <strong>用户意图：浏览、找到并查看具体内容。</strong
+                ><br />用户沿着同一条任务路径逐层深入。通常情况下，内屏需保留聊天列表，并展示当前会话或进一步打开的最高层级的内容，并保留逐层返回关系。
+              </p>
+            </div>
+            <img
+              src="assets/path-progressive.png"
+              width="384"
+              height="384"
+              alt="分屏递进路径示意"
+              loading="lazy"
+            />
+          </article>
+          <article class="path-card">
+            <div class="path-copy">
+              <h3>分屏交替并行</h3>
+              <p>
+                <strong>用户意图：围绕同一目标，在任务间反复参考或操作。</strong
+                ><br />用户需要持续关注聊天和关联内容，在两者之间反复查看、确认或操作。重点是需要减少寻找和往返的负担，同时保留双方的任务进度。
+              </p>
+            </div>
+            <img
+              src="assets/path-parallel.png"
+              width="384"
+              height="384"
+              alt="分屏交替并行路径示意"
+              loading="lazy"
+            />
+          </article>
+          <article class="path-card">
+            <div class="path-copy">
+              <h3>路径衔接</h3>
+              <p>
+                <strong>同一次使用场景中的路径可发生转变</strong
+                ><br />用户的路径会随任务目标变化：有时只需逐层查看并返回，有时则需要让聊天与内容持续配合。不同内容的操作方式和状态层级会影响任务间配合的体验。
+              </p>
+            </div>
+            <img
+              src="assets/path-transition.png"
+              width="384"
+              height="384"
+              alt="两种使用路径衔接示意"
+              loading="lazy"
+            />
+          </article>
+        </div>
+      </section>
+      <section class="content-ecosystem">
+        <h2>聚焦微信内容生态，<br />提炼核心多任务需求场景。</h2>
+        <p class="content-intro">
+          <strong>面对不同的内容类型，用户对其并行使用的期待可能有所不同</strong
+          >。梳理了微信中常见的内容类型，并对其可能携带的典型上下文情景进行梳理。
+        </p>
+        <div class="content-types">
+          <h3>
+            <img src="assets/content-heading.svg" alt="" />微信内常见内容类型
+          </h3>
+          <div
+            class="content-scroll"
+            tabindex="0"
+            aria-label="横向滚动查看更多内容类型"
+          >
+            <div class="content-cards">
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-0.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户围绕内容与他人交流、确认或反馈，需要在查看信息后继续回复。</span
+                ><span class="content-card-label">聊天会话</span>
+              </div>
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-1.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户查看对方发送的材料，并结合细节提出问题、解释或反馈。</span
+                ><span class="content-card-label">图片/文件</span>
+              </div>
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-2.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户一边与他人商量，一边查询、选择或填写信息。</span
+                ><span class="content-card-label">小程序</span>
+              </div>
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-3.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户观看或收听内容，同时处理消息，或与他人讨论内容。</span
+                ><span class="content-card-label">视频号等媒体内容</span>
+              </div>
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-4.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户通过链接或推送进入文章，阅读后返回，或参考文章内容进行讨论。</span
+                ><span class="content-card-label">公众号/服务号内容</span>
+              </div>
+              <div class="content-card" tabindex="0">
+                <img src="assets/content-5.png" alt="" /><span
+                  class="content-card-overlay"
+                ></span
+                ><span class="content-card-description"
+                  >用户打开链接阅读或查找信息，并将查到的内容用于回复或决策。</span
+                ><span class="content-card-label">网页/H5等</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="adaptation" aria-labelledby="adaptation-title">
+        <header class="adaptation-header">
+          <span class="adaptation-kicker">设计方案 Part 1</span>
+          <h2 id="adaptation-title">
+            基础适配设计<br />提升多任务基础场景和支撑能力体验
+          </h2>
+        </header>
+        <dl class="adaptation-summary">
+          <div>
+            <dt>核心目标</dt>
+            <dd>
+              依照 iPhone Duo 设计规范适配控件，优化现有浮窗功能在折叠屏上的体验
+            </dd>
+          </div>
+          <div>
+            <dt>代表任务关系 (典型场景)</dt>
+            <dd>中断与恢复 (聊天与文章阅读)</dd>
+          </div>
+        </dl>
+        <div class="adaptation-detail">
+          <div class="adaptation-copy">
+            <h3>独立的浮窗入口</h3>
+            <p>
+              直板机中，浮窗的入口设计为不干扰界面的竖条，用户可自定义浮窗入口和展开位置。我认为这是由于在直板机的比例限制下（屏幕水平方空间为紧凑布局，纵向为无限延伸的信息内容）而做出的平衡取舍。在iPhone
+              Duo中，水平空间增大，右侧先天让出了控制区，因此浮窗不必挤占内容的横向空间。这也降低了右侧控制栏与内容之间的“界限”要求。
+            </p>
+          </div>
+          <div
+            class="adaptation-gallery"
+            tabindex="0"
+            aria-label="左右滚动查看浮窗入口示意图"
+          >
+            <figure>
+              <img
+                src="assets/adaptation-folded-updated.png"
+                width="792"
+                height="490"
+                alt="折叠态下微信首页的浮窗入口示意"
+              />
+              <figcaption>折叠态示意</figcaption>
+            </figure>
+            <figure class="adaptation-open">
+              <img
+                src="assets/adaptation-open.png"
+                width="792"
+                height="490"
+                alt="展开态下微信首页的浮窗入口示意"
+              />
+              <figcaption>展开态示意</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="floating-position">
+          <div class="adaptation-copy">
+            <h3>保留浮窗展开位置自定义能力</h3>
+            <p>
+              原浮窗入口的位置是自由的，这样可以为用户提供更多自定义场景，方便浮窗展开后与底层界面内容之间的位置关系协调无遮挡。虽然浮窗入口是相对固定的，但展开后的浮窗面板仍旧可以保留这一自由度，记忆上一次浮窗面板的展开位置
+              (纵向位置)。
+            </p>
+          </div>
+          <div
+            class="adaptation-gallery floating-gallery"
+            tabindex="0"
+            aria-label="左右滚动查看浮窗位置示意"
+          >
+            <figure>
+              <div
+                class="floating-frame animation-awaiting-visibility"
+                aria-label="浮窗面板上下移动，展示可自定义高度"
+              >
+                <div class="floating-canvas">
+                  <div class="floating-backdrop"></div>
+                  <div class="floating-movement">
+                    <div class="floating-items">
+                      <img
+                        class="floating-items-image"
+                        src="assets/float-movement-2x.png"
+                        alt=""
+                      />
+                    </div>
+                    <div class="floating-handle-container">
+                      <div class="floating-handle"></div>
+                    </div>
+                  </div>
+                  <div class="floating-guides">
+                    <img src="assets/float-guide.svg" alt="" /><img
+                      src="assets/float-guide.svg"
+                      alt=""
+                    /><img src="assets/float-guide.svg" alt="" />
+                  </div>
+                  <div class="floating-fade-right"></div>
+                  <div class="floating-fade-left"></div>
+                  <div class="floating-rail-bottom"></div>
+                  <div class="floating-rail-top"></div>
+                </div>
+              </div>
+              <figcaption>示意-自定义浮窗展开的高度位置</figcaption>
+            </figure>
+            <figure class="floating-static">
+              <img
+                src="assets/float-position-folded-updated.png"
+                width="792"
+                height="490"
+                alt="折叠态下展开浮窗的示意图"
+              />
+              <figcaption>折叠态示意</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+      <section class="split-design" aria-labelledby="split-title">
+        <div class="split-intro">
+          <header class="adaptation-header">
+            <span class="adaptation-kicker">设计方案 Part 2</span>
+            <h2 id="split-title">
+              内屏多任务分屏设计<br />围绕关联任务场景拓展并行能力
+            </h2>
+          </header>
+          <dl class="adaptation-summary">
+            <div>
+              <dt>核心目标</dt>
+              <dd>允许某些内容在内屏中进行组合，并不干扰原有层级的递进关系</dd>
+            </div>
+            <div>
+              <dt>代表任务关系 (典型场景)</dt>
+              <dd>交替参考/并行协作 (与朋友讨论话题，同时在小程序/文章中查询)</dd>
+            </div>
+          </dl>
+          <p class="split-copy">
+            在中断与恢复场景中，打断用户的信息通常只需被处理一次，该信息通常与用户当前正在浏览的内容没有关联。这种情况下，常规的浮窗或消息浮层逻辑已经足够，用户可能无需展开屏幕即可完成需求的处理。但当用户需要反复查看或持续操作多项任务时，内屏应当及时发挥其可用空间优势，通过同时展示多条任务线的内容缩短用户路径。
+          </p>
+        </div>
+        <div class="split-solution">
+          <div class="split-description">
+            <h3>方案2.1: 通过“保留”固定分屏内容</h3>
+            <p class="split-copy">
+              双面板默认保持递进关系：用户在左侧选择内容，右侧展示对应页面。当用户希望保留正在查看的内容，同时处理其他会话时，点击交界处可将右侧内容保留；此后左侧继续导航，右侧保持不变。当新内容需要占用已固定的右侧，用户可先临时查看，或主动将原内容暂存后替换。这样，用户无需预先判断面板之间的复杂状态，也能明确控制当前任务是否被保留。
+            </p>
+          </div>
+          <div
+            class="adaptation-gallery split-gallery"
+            tabindex="0"
+            aria-label="左右滚动查看分屏保留状态示意"
+          >
+            <div class="split-selector">
+              <img
+                id="split-diagram"
+                src="assets/split-diagram-keep.png"
+                width="384"
+                height="420"
+                alt="保留状态的起始面板和尾侧面板示意"
+              />
+              <div
+                class="split-controls"
+                role="group"
+                aria-label="选择分屏保留状态"
+              >
+                <button
+                  type="button"
+                  data-split-state="keep"
+                  aria-pressed="true"
+                >
+                  保留</button
+                ><button
+                  type="button"
+                  data-split-state="free"
+                  aria-pressed="false"
+                >
+                  不保留</button
+                ><button
+                  type="button"
+                  data-split-state="unavailable"
+                  aria-pressed="false"
+                >
+                  不可保留
+                </button>
+              </div>
+            </div>
+            <img
+              class="split-device"
+              id="split-device"
+              src="assets/split-screen-keep.png"
+              width="792"
+              height="490"
+              alt="保留状态的内屏多任务示意"
+            />
+          </div>
+          <div class="split-copy split-reflection">
+            <p>本方案最早期的核心思路是<strong>用分隔器控制两个面板处于导航关联或是各自独立任务</strong>。为覆盖所有场景，分隔器被定义了“可选与否”+“递进/分离”的2*2共计4种情况，对左右的不同组合做出了规定。但由于存在左右内容匹配的限制，这种方案让规则十分复杂，用户很难快速学习。</p>
+            <p>在上述问题的基础上，方案进行了一定优化，<strong>不再让分隔器负责管理递进/分离的四种状态，而是保留默认的递进导航，聚焦对右侧任务的“保留”动作，用户只需要判断右侧内容是否需要保留。当新内容需要占用右侧时，再由用户决定如何处理。</strong></p>
+            <p>这种“保护了右侧内容”的心智削减了学习难度，它会在保留时切断上下文，使其独立。但却仍然会让左侧的新内容无处依附。例如，左侧面板为聊天会话，右侧面板为固定的公众号文章，此时用户若要打开会话中的图片或朋友分享的内容链接，就会与右侧固定的内容产生冲突。在浮窗数量限制为5个的情况下，无法借用浮窗来临时承载被替代的固定内容。对此，可能需要新定义一种临时预览的层级，例如SwiftUI中的Overlay arrangement，借用Sheet来预览内容，但都会显著增加交互层级的复杂度。</p>
+            <p>为此制作了方案2.2，直接依赖浮窗能力来闭环多任务功能。</p>
+          </div>
+        </div>
+        <div class="collab-solution">
+          <div class="split-description">
+            <h3>方案2.2: 以浮窗为核心的双面板协作</h3>
+            <p class="split-copy">
+              默认状态下，左侧展示聊天列表，右侧按微信原有层级逐步打开会话、文章或其他内容。当用户需要同时处理两项任务时，可将内容加入浮窗并在右侧展开；此时左侧允许进入聊天内容页，两侧暂时独立。当用户从左侧打开新的内容时，右侧浮窗自动回收，界面回到默认结构，用户仍可通过浮窗恢复原任务。该方案平衡了微信已有的浮窗心智，建立单任务浏览与双任务并行之间的转换，通过浮窗中转消解了上一方案带来的固定态复杂性问题。
+            </p>
+          </div>
+          <div
+            class="adaptation-gallery collab-gallery"
+            tabindex="0"
+            aria-label="左右滚动查看双面板协作示意"
+          >
+            <figure>
+              <div
+                class="collab-stage animation-awaiting-visibility"
+                aria-label="将浮窗任务拖入视窗的动画"
+              >
+                <div class="collab-stage-canvas">
+                  <div class="collab-screen-window">
+                    <div class="collab-animation">
+                      <img
+                        class="collab-background"
+                        src="assets/collab-background.png"
+                        alt=""
+                      />
+                      <div class="collab-shade"></div>
+                      <div class="collab-target-position">
+                        <div class="collab-target"></div>
+                      </div>
+                      <div class="collab-cards">
+                        <div class="collab-card collab-card-0">
+                          <img src="assets/collab-card-0.svg" alt="" />
+                        </div>
+                        <div class="collab-card collab-card-1">
+                          <img src="assets/collab-card-1.svg" alt="" />
+                        </div>
+                        <div class="collab-card collab-card-2">
+                          <img src="assets/collab-card-2.svg" alt="" />
+                        </div>
+                        <div class="collab-card collab-card-3">
+                          <img src="assets/collab-card-3.svg" alt="" />
+                        </div>
+                        <div class="collab-card collab-card-4">
+                          <img src="assets/collab-card-4.svg" alt="" />
+                        </div>
+                        <div class="collab-handle"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="collab-device-border"></div>
+                  <img
+                    class="collab-frame"
+                    src="assets/collab-frame.svg"
+                    alt=""
+                  />
+                </div>
+              </div>
+              <figcaption>从浮窗中拖入任务至视窗</figcaption>
+            </figure>
+            <figure>
+              <div class="collab-stage collab-stage-example" role="img" aria-label="会话与任务组合的内屏示意">
+                <div class="collab-stage-canvas" aria-hidden="true">
+                  <img class="collab-example-screen" src="assets/collab-example-screen-latest.png" alt="" />
+                  <div class="collab-device-border"></div>
+                  <img class="collab-frame" src="assets/collab-frame.svg" alt="" />
+                </div>
+              </div>
+              <figcaption>示例：会话+任务组合形式</figcaption>
+            </figure>
+          </div>
+        </div>
+        <section class="rules-section" aria-label="分屏规则取舍">
+          <div class="rules-intro">
+            <h3>规则取舍：仅允许浮窗任务与聊天独立并行</h3>
+            <p>
+              本方案优先支持相对独立的任务并行。借助微信已有的浮窗心智，用户可以建立单任务浏览与双任务并行之间的转换，同时保持多任务逻辑清晰，可随时在多任务并行-单任务递进的模式下转化。
+            </p>
+          </div>
+          <div class="rules-block">
+            <div class="rules-copy">
+              <h4>默认状态：保留原有递进导航关系</h4>
+              <p>
+                默认状态下，左侧固定展示聊天列表，右侧展示用户选中的会话，并承载从会话或公众号
+                /
+                服务号消息聚合页中继续打开的内容。用户可通过右侧返回操作回到上一页面，保持原有的逐层浏览路径。
+              </p>
+            </div>
+            <div
+              class="rules-stage rules-stage-default animation-awaiting-visibility"
+              aria-label="默认状态下的递进导航演示"
+            >
+              <div class="rules-canvas">
+                <div class="rules-screen rules-screen-default">
+                  <img
+                    class="rules-image r81"
+                    src="assets/rules-81.png"
+                    alt=""
+                  />
+                  <div class="rules-dim-default"></div>
+                  <img
+                    class="rules-image r83"
+                    src="assets/rules-83.png"
+                    alt=""
+                  /><img
+                    class="rules-image r84"
+                    src="assets/rules-84.png"
+                    alt=""
+                  /><img
+                    class="rules-image r85"
+                    src="assets/rules-85.png"
+                    alt=""
+                  />
+                </div>
+                <div
+                  class="rules-device-border rules-device-border-default"
+                ></div>
+                <img
+                  class="rules-device-frame rules-device-frame-default"
+                  src="assets/collab-frame.svg"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+          <div class="rules-block">
+            <div class="rules-copy">
+              <h4>浮窗并行：仅允许「聊天 + 内容」并行</h4>
+              <p>
+                当用户需要一边聊天、一边查看或操作另一项内容时，可将内容加入浮窗并在右侧展开。此时左侧允许进入具体聊天会话，形成「左侧聊天
+                +
+                右侧浮窗内容」的并行布局。两侧暂时独立：左侧切换会话时，右侧浮窗内容保持不变；若用户从左侧聊天打开新内容，原浮窗收回，界面恢复默认递进结构。
+              </p>
+            </div>
+            <div
+              class="rules-carousel"
+              tabindex="0"
+              aria-label="左右滚动查看浮窗并行演示"
+            >
+              <div class="rules-carousel-track">
+                <figure>
+                  <div
+                    class="rules-stage animation-awaiting-visibility"
+                    aria-label="聊天与内容并行演示"
+                  >
+                    <div class="rules-canvas">
+                      <div class="rules-screen rules-screen-first">
+                        <img
+                          class="rules-image r79"
+                          src="assets/rules-79.png"
+                          alt=""
+                        /><img
+                          class="rules-image r87"
+                          src="assets/rules-87.png"
+                          alt=""
+                        /><img
+                          class="rules-image r97"
+                          src="assets/rules-97.png"
+                          alt=""
+                        /><img
+                          class="rules-image r88"
+                          src="assets/rules-88.png"
+                          alt=""
+                        />
+                        <div class="rules-dim-first"></div>
+                        <div class="rules-slide-mask">
+                          <img
+                            class="rules-image r86"
+                            src="assets/rules-86.png"
+                            alt=""
+                          />
+                        </div>
+                      </div>
+                      <div class="rules-device-border"></div>
+                      <img
+                        class="rules-device-frame"
+                        src="assets/collab-frame.svg"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <figcaption>
+                    聊天是微信用户的核心场景。用户打开文章、图片、文件或小程序内容后，可能仍需要回看消息、与对方讨论，或将操作结果反馈给对方。此时，聊天与内容分别承担交流和查看的任务，构成了交替并行的场景。
+                  </figcaption>
+                </figure>
+                <figure>
+                  <div
+                    class="rules-stage animation-awaiting-visibility"
+                    aria-label="公众号聚合页与文章的递进导航演示"
+                  >
+                    <div class="rules-canvas">
+                      <div class="rules-screen rules-screen-second">
+                        <img
+                          class="rules-image r96"
+                          src="assets/rules-96.png"
+                          alt=""
+                        /><img
+                          class="rules-image r90"
+                          src="assets/rules-90.png"
+                          alt=""
+                        />
+                        <div class="rules-second-bg"></div>
+                        <div class="rules-second-mask">
+                          <img
+                            class="rules-image r94"
+                            src="assets/rules-94.png"
+                            alt=""
+                          />
+                        </div>
+                        <img
+                          class="rules-image r91"
+                          src="assets/rules-91.png"
+                          alt=""
+                        /><img
+                          class="rules-image r95"
+                          src="assets/rules-95.png"
+                          alt=""
+                        />
+                      </div>
+                      <div class="rules-device-border"></div>
+                      <img
+                        class="rules-device-frame"
+                        src="assets/collab-frame.svg"
+                        alt=""
+                      />
+                    </div>
+                  </div>
+                  <figcaption>
+                    相比之下，公众号消息聚合页与文章主要构成“选择内容—阅读内容”的导航关系。本方案认为，用户阅读时不一定需要持续操作聚合页，因此聚合页将替代被打开的浮窗，浮窗回收。若要支持在左侧连续选择文章、让右侧同步切换，需额外建立一套面板联动和退出的规则。因此，本方案优先保留聚合页到文章的逐层导航，将独立并行聚焦于<strong
+                      >聊天 + 内容</strong
+                    >。
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+          <div class="rules-combinations">
+            <div class="combinations-intro">
+              <h4>多任务组合规则</h4>
+              <p>
+                两侧不同时展示同类内容，例如不同时展示两个具体聊天会话。该规则用于保持面板分工清楚，减少用户对当前操作对象的混淆。全部规则匹配情况见下表。
+              </p>
+            </div>
+            <div class="combinations-allowed">
+              <h5>面板中允许展示的内容</h5>
+              <dl>
+                <div>
+                  <dt>Leading Pane</dt>
+                  <dd>聊天列表；聊天会话内容 (一定条件下允许)</dd>
+                </div>
+                <div>
+                  <dt>Trailing Pane</dt>
+                  <dd>
+                    聊天会话内容；图片/文件；公众号/服务号文章；小程序；网页/H5
+                  </dd>
+                </div>
+              </dl>
+            </div>
+            <div class="combinations-matrix">
+              <h5>组合匹配规则</h5>
+              <div
+                class="matrix-scroll"
+                tabindex="0"
+                role="region"
+                aria-label="横向滚动查看全部组合匹配规则"
+              >
+                <div class="matrix-content">
+                  <div class="matrix-header">
+                    <div class="matrix-axis">
+                      <div>
+                        <img src="assets/matrix-trailing.svg" alt="" /><strong
+                          >Trailing<br />Pane</strong
+                        >
+                      </div>
+                      <div>
+                        <img src="assets/matrix-leading.svg" alt="" /><strong
+                          >Leading<br />Pane</strong
+                        >
+                      </div>
+                    </div>
+                    <div class="matrix-cards">
+                      <div class="matrix-card">
+                        <img src="assets/content-0.png" alt="" /><span
+                          >聊天会话</span
+                        >
+                      </div>
+                      <div class="matrix-card">
+                        <img src="assets/content-1.png" alt="" /><span
+                          >图片/文件</span
+                        >
+                      </div>
+                      <div class="matrix-card">
+                        <img src="assets/content-2.png" alt="" /><span
+                          >小程序</span
+                        >
+                      </div>
+                      <div class="matrix-card">
+                        <img src="assets/content-3.png" alt="" /><span
+                          >视频号等媒体内容</span
+                        >
+                      </div>
+                      <div class="matrix-card">
+                        <img src="assets/content-4.png" alt="" /><span
+                          >公众号/服务号内容</span
+                        >
+                      </div>
+                      <div class="matrix-card">
+                        <img src="assets/content-5.png" alt="" /><span
+                          >网页/H5等</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="matrix-table">
+                    <div class="matrix-row-labels">
+                      <strong>聊天列表页</strong><strong>聊天会话页</strong>
+                    </div>
+                    <div class="matrix-rows">
+                      <div class="matrix-row">
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >默认递进</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >递进或浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >递进或浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-unknown.svg" alt="" /><span
+                            >媒体具有特殊性，本方案暂不讨论</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >递进或浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >递进或浮窗</span
+                          >
+                        </div>
+                      </div>
+                      <div class="matrix-row">
+                        <div class="matrix-cell">
+                          <span class="matrix-cross" aria-hidden="true">×</span
+                          ><span>不允许同类出现</span>
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >仅限浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >仅限浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-unknown.svg" alt="" /><span
+                            >媒体具有特殊性，本方案暂不讨论</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >仅限浮窗</span
+                          >
+                        </div>
+                        <div class="matrix-cell">
+                          <img src="assets/matrix-yes.svg" alt="" /><span
+                            >仅限浮窗</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="context-section" aria-labelledby="context-title">
+          <div class="context-inner">
+            <div class="context-copy">
+              <h3 id="context-title">
+                不携带上下文的浮窗：通过设计区分内容来源
+              </h3>
+              <p>
+                多任务目标下，用户可通过浮窗打开一些本不属于当前任务流程的内容。因此，<strong>左右面板的内容之间不一定存在连续性</strong>。例如，对于右侧为“公众号文章”的情景，文章可以由用户从公众号中打开
+                (递进)，可以是来自好友聊天中的分享
+                (递进)，也可以由用户从浮窗独立打开。由于浮窗不携带上下文
+                (内容来源)，有必要做出一定视觉元素的区隔，使用户得以获悉当前的左右内容是否上下文连续。
+              </p>
+            </div>
+            <div class="context-comparison">
+              <figure>
+                <img
+                  src="assets/context-independent.png"
+                  width="384"
+                  height="384"
+                  alt="通过浮窗打开文章，左右面板之间使用视觉分隔"
+                />
+                <figcaption>通过浮窗打开-左右面板无上下文连接</figcaption>
+              </figure>
+              <figure>
+                <img
+                  src="assets/context-continuous.png"
+                  width="384"
+                  height="384"
+                  alt="连续递进打开文章，左右面板保持上下文连接"
+                />
+                <figcaption>连续递进-左右面板有上下文连接</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+      </section>
+      <section class="hierarchy-design" aria-labelledby="hierarchy-title">
+        <header class="adaptation-header">
+          <span class="adaptation-kicker">设计方案 Part 3</span>
+          <h2 id="hierarchy-title">
+            视图层级设计<br />实现内外屏切换的无缝衔接体验
+          </h2>
+        </header>
+        <dl class="adaptation-summary">
+          <div>
+            <dt>核心目标</dt>
+            <dd>
+              在可用空间发生变化时重新组织视图的显示，并保留任务路径，让用户理解信息层级关系。
+            </dd>
+          </div>
+          <div>
+            <dt>代表任务关系 (典型场景)</dt>
+            <dd>全部任务关系</dd>
+          </div>
+        </dl>
+        <div class="hierarchy-copy">
+          <p>
+            微信中的多任务往往不会随着设备开合而结束。当用户在内屏中同时处理聊天与内容，或沿着消息路径逐层浏览时，合屏会改变可用空间，也会改变当前可见的页面。为此，方案通过明确多任务场景下的视图层级与状态转换规则，决定空间变化时的页面层级展示逻辑。
+          </p>
+          <p>
+            *
+            由于本题聚焦多任务场景，且内外屏切换的体验在分屏递进与分屏交替并行之间并无显著可预见的冲突，因此下述内容只包含分屏交替并行场景。
+          </p>
+        </div>
+        <div class="hierarchy-demo">
+          <div
+            class="hierarchy-rules"
+            role="group"
+            aria-label="选择视图层级规则"
+          >
+            <button type="button" data-rule="1" aria-pressed="true">
+              <strong>规则一：折叠后优先保留浮窗内容</strong
+              ><span
+                >当用户在内屏展开浮窗内容，且尚未在另一侧进入具体聊天时，合屏后优先在外屏延续该内容。用户可以继续阅读或操作，保留了原有的浮窗逻辑。</span
+              ></button
+            ><button type="button" data-rule="2" aria-pressed="false">
+              <strong>规则二：交替并行场景下，优先保留操作中的内容</strong
+              ><span
+                >当聊天与浮窗内容同时展示且正在交流时，合屏后优先延续用户当前正在操作的任务，另一项任务暂时退出屏幕，但保留其状态和恢复路径。</span
+              ></button
+            ><button type="button" data-rule="3" aria-pressed="false">
+              <strong>规则三：适应可用空间宽度变化，避开弯折处</strong
+              ><span
+                >当设备开合、部分折叠或微信窗口宽度变化时，根据实际可用空间调整面板布局。设备半折时，浮窗内容和组件避开中央弯折区域，减少遮挡与误触。</span
+              >
+            </button>
+          </div>
+          <section id="duo-demo" aria-label="可折叠设备演示"></section>
+        </div>
+      </section>
+      <!-- 页面结尾 -->
+      <footer class="page-ending" aria-label="全文结束">
+        <div class="page-ending-title"><span>全文结束，感谢阅读</span></div>
+        <div class="page-ending-art" role="img" aria-label="iPhone Duo 微信多任务体验展示">
+          <img class="page-ending-image" src="assets/footer-latest.png" width="1200" height="694" alt="" />
+        </div>
+      </footer>
+    </main>
+    <script type="module" src="main.js"></script>
+    <script src="vendor/apple-duo/runtime.js"></script>
+    <script type="module" src="mockup.js"></script>
+  </body>
+</html>

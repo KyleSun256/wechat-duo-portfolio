@@ -7,3 +7,11 @@
 #duo-demo{margin-top:0}.mockup-replay{position:absolute;bottom:101px;left:50%;transform:translateX(-50%);z-index:2;background:#f5f5f7;color:#6c6c6d;border:0;border-radius:36px;padding:6px 12px;font:inherit;cursor:pointer}.mockup-replay[hidden]{display:none}
 /* Replay appears only after the folded-screen animation has finished. */
 .mockup-replay{display:flex;align-items:center;gap:4px;padding:4px 12px 4px 8px;font-family:inherit;font-size:16px;font-weight:500;line-height:24px;white-space:nowrap;animation:mockup-replay-in .25s ease both}.mockup-replay img{width:24px;height:24px;display:block}.mockup-replay:focus-visible{outline:2px solid #00af6c;outline-offset:3px}.mockup-replay[hidden]{display:none}@keyframes mockup-replay-in{from{opacity:0;transform:translate(-50%,5px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}@media(prefers-reduced-motion:reduce){.mockup-replay{animation:none}}
+
+/* 容器与渲染画布同比缩放，保留底部姿态控件所需空间。 */
+.mockup-stage { width:100%; height:auto; aspect-ratio:3 / 2; min-height:320px; }
+.device-scene { height:110%; top:-9%; }
+.mockup-controls { bottom:clamp(20px,3.3vw,40px); }
+@media(max-width:760px){.mockup-stage{height:auto}.device-scene{height:110%;top:-9%}.mockup-controls{bottom:20px}}
+
+@media (max-width: 500px) { .device-scene { height: 94%; top: -7%; } }
