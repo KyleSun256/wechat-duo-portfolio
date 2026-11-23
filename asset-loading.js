@@ -115,5 +115,37 @@
       }
     }
   }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'srcset'] });
+  // 附近内容仍由浏览器优先加载；空闲时按页面顺序逐项预加载其余内容。
+  const retainedPreloads = [];
+  const idle = () => new Promise(resolve => {
+    if ('requestIdleCallback' in window) requestIdleCallback(resolve, { timeout: 2000 });
+    else setTimeout(resolve, 100);
+  });
+  async function preloadFile(url) {
+    const image = new Image();
+    retainedPreloads.push(image);
+    image.src = url;
+    try { await waitImage(image); } catch (error) { console.warn('预加载图片失败', url); }
+  }
+  async function preloadInPageOrder() {
+    const items = [...document.querySelectorAll('img, #duo-demo')];
+    for (const item of items) {
+      await idle();
+      if (item.id === 'duo-demo') {
+        try { await window.preloadDuoMockup?.(); } catch (error) { console.warn('预加载样机失败', error); }
+      } else {
+        item.loading = 'eager';
+        try { await waitImage(item); } catch (error) { /* 加载失败时继续下一项。 */ }
+        if (item.id === 'split-diagram') {
+          for (const state of ['free', 'unavailable']) await preloadFile(`assets/split-diagram-${state}.png`);
+        } else if (item.id === 'split-device') {
+          for (const state of ['free', 'unavailable']) await preloadFile(`assets/split-screen-${state}.png`);
+        }
+      }
+    }
+  }
+  const beginBackgroundPreload = () => setTimeout(preloadInPageOrder, 1000);
+  if (document.readyState === 'complete') beginBackgroundPreload();
+  else addEventListener('load', beginBackgroundPreload, { once: true });
   addEventListener('scroll', schedule, true); addEventListener('resize', schedule);
 })();
