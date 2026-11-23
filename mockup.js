@@ -37,7 +37,7 @@ async function choose(target){
   }finally{if(!playbackActive&&!ruleTransition)setControlsLocked(false)}
 }
 host.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>choose(Number(b.dataset.open))));
-async function init(){try{const req=window.duoRequire;const singleton=req('ApY4q/z+mDxRKgUHvbiF').ProductViewerWebGLSingleton;let Scene;singleton.loadScene=C=>{Scene=C};await req('pz0qtX7E9h5JJTfW5E1X').default.prototype.onViewerTriggerLoad.call({});lotus=window.Lotus;class DemoScene extends Scene{introHintSetup(){} }scene=await lotus.instance().loadScene({src:'./vendor/apple-duo/scenes/iPhoneDuo_ROW_L_avif.lsd',element:stage,SceneClass:DemoScene,assetsPath:'./vendor/apple-duo'});const model=scene.getComponentByName('JcvKFcEkqQvxADI').element;rotationPivot=new lotus.THREE.Group();model.parent.add(rotationPivot);rotationPivot.add(model);render(progress);for(const kind of ['inner','bent','outer'])await setMockupScreen(kind,ruleScreens[selectedRule][kind]);modelReady=true;stage.querySelector('.scene-status')?.remove();setControlsLocked(false);}catch(e){console.error(e);stage.querySelector('.scene-status').textContent='3D 样机加载失败：'+e.message;}}
+async function init(){try{const req=window.duoRequire;const singleton=req('ApY4q/z+mDxRKgUHvbiF').ProductViewerWebGLSingleton;let Scene;singleton.loadScene=C=>{Scene=C};await req('pz0qtX7E9h5JJTfW5E1X').default.prototype.onViewerTriggerLoad.call({});lotus=window.Lotus;class DemoScene extends Scene{introHintSetup(){} }scene=await lotus.instance().loadScene({src:'./vendor/apple-duo/scenes/iPhoneDuo_ROW_L_avif.lsd',element:stage,SceneClass:DemoScene,assetsPath:'./vendor/apple-duo'});const model=scene.getComponentByName('JcvKFcEkqQvxADI').element;rotationPivot=new lotus.THREE.Group();model.parent.add(rotationPivot);rotationPivot.add(model);render(progress);await waitForScreenMaterials();for(const kind of ['inner','bent','outer'])await setMockupScreen(kind,ruleScreens[selectedRule][kind]);modelReady=true;stage.querySelector('.scene-status')?.remove();setControlsLocked(false);}catch(e){console.error(e);stage.querySelector('.scene-status').textContent='3D 样机加载失败：'+e.message;}}
 export const mockupReady=init();
 // Custom screens retain the original Wipe shader on the original screen meshes.
 const imageCache=new Map();
@@ -51,6 +51,20 @@ function loadScreenImage(url){
 }
 const generations={inner:0,bent:0,outer:0};
 const customTextures={};let screenController;const screens={};let blendTarget,blendScene,blendCamera,blendMaterial;
+// 场景加载与屏幕控制器的纹理初始化是两个异步过程，网络慢时要等待后者完成。
+async function waitForScreenMaterials(){
+  const deadline=Date.now()+90000;
+  while(Date.now()<deadline){
+    const controller=Array.from(scene.scripts).find(script=>script.script==='FadeThroughBlack');
+    if(controller?._meshesReady&&controller.insideMesh?.material&&controller.outsideMesh?.material){
+      screenController=controller;
+      return;
+    }
+    await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  throw new Error('屏幕资源加载超时，请检查网络后刷新重试');
+}
+
 // Images are uploaded only when changed. Their crossfade is rendered on the GPU.
 function updateInnerComposite(){if(!lotus||!screens.inner||!screenController?.insideMesh)return;const THREE=lotus.THREE;if(!blendTarget){blendTarget=lotus.instance().scene.renderer.createRenderTarget(2670,1878,{samples:0});blendTarget.depthBuffer=false;blendScene=new THREE.Scene();blendCamera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);blendMaterial=new THREE.ShaderMaterial({uniforms:{first:{value:null},second:{value:null},amount:{value:0}},vertexShader:'varying vec2 texUv; void main(){texUv=uv;gl_Position=vec4(position.xy,0.0,1.0);}',fragmentShader:'uniform sampler2D first;uniform sampler2D second;uniform float amount;varying vec2 texUv;void main(){gl_FragColor=mix(texture2D(first,vec2(texUv.x,1.0-texUv.y)),texture2D(second,vec2(texUv.x,1.0-texUv.y)),amount);}',depthTest:false,depthWrite:false});blendScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),blendMaterial));}
 blendMaterial.uniforms.first.value=screens.inner;blendMaterial.uniforms.second.value=screens.bent||screens.inner;blendMaterial.uniforms.amount.value=screens.bent?screenMix:0;const renderer=lotus.instance().scene.renderer;const previous=renderer.getRenderTarget();renderer.setRenderTarget(blendTarget);renderer.render(blendScene,blendCamera);renderer.setRenderTarget(previous);screenController.insideMesh.material.emissiveMapTarget=blendTarget.texture;lotus.Lotus.tryRequestAnimationFrame();}
