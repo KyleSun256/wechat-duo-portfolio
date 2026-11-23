@@ -1,10 +1,10 @@
 // The folded screen animation is drawn from the Figma layers onto a live texture.
 let foldAnimationTexture=null;
 const ruleScreens = Object.fromEntries([1,2,3].map(rule=>[rule,Object.fromEntries(['inner','bent','outer'].map(kind=>[kind,`./assets/rule${rule}-${kind}.png`]))]));
-let selectedRule=1, screenBrightness=1, ruleTransition=false, playbackActive=false;
+let selectedRule=1, screenBrightness=1, ruleTransition=false, playbackActive=false, modelReady=false;
 const ruleButtons=document.querySelectorAll('[data-rule]');
 const host=document.querySelector('#duo-demo');
-host.innerHTML=`<div class="mockup-stage"><div class="device-scene"></div><button type="button" class="mockup-replay" hidden><img src="assets/replay.svg" alt=""><span>重新播放</span></button><div class="mockup-controls" role="group" aria-label="样机开合"><button type="button" data-open="1" aria-pressed="true"><span><img src="assets/unfold.svg" alt=""></span>展开</button><button type="button" data-open="0.65" aria-pressed="false"><span><img src="assets/bend.svg" alt=""></span>弯折</button><button type="button" data-open="0" aria-pressed="false"><span><img src="assets/fold.svg" alt=""></span>折叠</button></div><label class="fold-slider" hidden>拖动体验开合<input type="range" min="0" max="100" value="100" aria-label="展开程度"><output>完全展开</output></label><span class="mockup-status" role="status"></span></div>`;
+host.innerHTML=`<div class="mockup-stage"><div class="device-scene"></div><button type="button" class="mockup-replay" hidden><img src="assets/replay.svg" alt=""><span>重新播放</span></button><div class="mockup-controls" role="group" aria-label="样机开合"><button type="button" data-open="1" disabled aria-pressed="true"><span><img src="assets/unfold.svg" alt=""></span>展开</button><button type="button" data-open="0.65" disabled aria-pressed="false"><span><img src="assets/bend.svg" alt=""></span>弯折</button><button type="button" data-open="0" disabled aria-pressed="false"><span><img src="assets/fold.svg" alt=""></span>折叠</button></div><label class="fold-slider" hidden>拖动体验开合<input type="range" min="0" max="100" value="100" aria-label="展开程度"><output>完全展开</output></label><span class="mockup-status" role="status"></span></div>`;
 const slider=host.querySelector('input[type=range]'),output=host.querySelector('output');
 const stage=host.querySelector('.device-scene');stage.innerHTML='<p class="scene-status" role="status">正在载入 3D 样机…</p>';
 stage.dataset.productViewerId='duo-demo';stage.dataset.rtScenesPath='./vendor/apple-duo';stage.dataset.rtScenes='{}';stage.dataset.rtStates='{}';stage.dataset.rtAnalytics='{}';stage.dataset.ptBig='[]';stage.dataset.ptSmol='[]';stage.dataset.matchingAngles='[]';stage.classList.add('product-viewer-canvas');
@@ -19,7 +19,7 @@ function tween(from,to,duration,update,id){return new Promise(resolve=>{const st
 async function openToBent(id){departingBent=false;setClarity(0);const from=progress,startLayout=layoutBlend;if(!await tween(0,1,1100,t=>{layoutBlend=startLayout+(1-startLayout)*t;render(from+(.65-from)*t)},id))return false;await new Promise(resolve=>setTimeout(resolve,1000));if(id!==runId)return false;const startRotation=rotation,startClarity=clarity,startMix=screenMix;bentBrightnessStart=screenController?.insideMesh?.material?.uniforms?.brightness?.value??1;return tween(0,1,900,t=>{rotate(startRotation+(-.55-startRotation)*t);render(progress);setClarity(startClarity+(1-startClarity)*t);setMix(startMix+(1-startMix)*t)},id)}
 async function bentToOpen(id,target){departingBent=true;setClarity(1);const from=progress,startRotation=rotation,startLayout=layoutBlend,startMix=screenMix;const done=await tween(0,1,1100,t=>{layoutBlend=startLayout*(1-t);rotate(startRotation*(1-t));render(from+(target-from)*t);if(target===1)setMix(startMix*(1-t))},id);if(!done)return false;if(target!==0)departingBent=false;return true}
 async function choose(target){
-  if(ruleTransition||playbackActive||!scene)return;
+  if(!modelReady||ruleTransition||playbackActive)return;
   host.querySelector('.mockup-replay').hidden=true;
   if(foldAnimationTexture&&mode===0){screenController.outsideMesh.material.emissiveMapTarget=screens.outer;foldAnimationTexture.dispose();foldAnimationTexture=null;}
   if(mode===0&&departingBent){setMix(0);setClarity(0);departingBent=false;}
@@ -37,7 +37,7 @@ async function choose(target){
   }finally{if(!playbackActive&&!ruleTransition)setControlsLocked(false)}
 }
 host.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>choose(Number(b.dataset.open))));
-async function init(){try{const req=window.duoRequire;const singleton=req('ApY4q/z+mDxRKgUHvbiF').ProductViewerWebGLSingleton;let Scene;singleton.loadScene=C=>{Scene=C};await req('pz0qtX7E9h5JJTfW5E1X').default.prototype.onViewerTriggerLoad.call({});lotus=window.Lotus;class DemoScene extends Scene{introHintSetup(){} }scene=await lotus.instance().loadScene({src:'./vendor/apple-duo/scenes/iPhoneDuo_ROW_L_avif.lsd',element:stage,SceneClass:DemoScene,assetsPath:'./vendor/apple-duo'});const model=scene.getComponentByName('JcvKFcEkqQvxADI').element;rotationPivot=new lotus.THREE.Group();model.parent.add(rotationPivot);rotationPivot.add(model);stage.querySelector('.scene-status')?.remove();render(progress);for(const kind of ['inner','bent','outer'])await setMockupScreen(kind,ruleScreens[selectedRule][kind]);setControlsLocked(false);}catch(e){console.error(e);stage.querySelector('.scene-status').textContent='3D 样机加载失败：'+e.message;}}
+async function init(){try{const req=window.duoRequire;const singleton=req('ApY4q/z+mDxRKgUHvbiF').ProductViewerWebGLSingleton;let Scene;singleton.loadScene=C=>{Scene=C};await req('pz0qtX7E9h5JJTfW5E1X').default.prototype.onViewerTriggerLoad.call({});lotus=window.Lotus;class DemoScene extends Scene{introHintSetup(){} }scene=await lotus.instance().loadScene({src:'./vendor/apple-duo/scenes/iPhoneDuo_ROW_L_avif.lsd',element:stage,SceneClass:DemoScene,assetsPath:'./vendor/apple-duo'});const model=scene.getComponentByName('JcvKFcEkqQvxADI').element;rotationPivot=new lotus.THREE.Group();model.parent.add(rotationPivot);rotationPivot.add(model);render(progress);for(const kind of ['inner','bent','outer'])await setMockupScreen(kind,ruleScreens[selectedRule][kind]);modelReady=true;stage.querySelector('.scene-status')?.remove();setControlsLocked(false);}catch(e){console.error(e);stage.querySelector('.scene-status').textContent='3D 样机加载失败：'+e.message;}}
 init();
 // Custom screens retain the original Wipe shader on the original screen meshes.
 const generations={inner:0,bent:0,outer:0};
@@ -99,7 +99,7 @@ function setBrightness(value){
   lotus?.Lotus.tryRequestAnimationFrame();
 }
 async function selectRule(rule){
-  if(!scene||ruleTransition||playbackActive||selectedRule===rule)return;
+  if(!modelReady||ruleTransition||playbackActive||selectedRule===rule)return;
   ruleTransition=true;setControlsLocked(true);host.querySelector('.mockup-replay').hidden=true;
   if(foldAnimationTexture&&mode===0){screenController.outsideMesh.material.emissiveMapTarget=screens.outer;foldAnimationTexture.dispose();foldAnimationTexture=null;}
   const id=++runId;

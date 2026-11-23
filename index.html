@@ -2,11 +2,13 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add("asset-loading-enabled");</script>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>微信多任务体验设计</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="mockup.css" />
     <link rel="stylesheet" href="spacing.css" />
+    <link rel="stylesheet" href="asset-loading.css" />
   </head>
   <body>
     <header class="cover" aria-label="项目介绍">
@@ -960,17 +962,17 @@
             role="group"
             aria-label="选择视图层级规则"
           >
-            <button type="button" data-rule="1" aria-pressed="true">
+            <button type="button" data-rule="1" disabled aria-pressed="true">
               <strong>规则一：折叠后优先保留浮窗内容</strong
               ><span
                 >当用户在内屏展开浮窗内容，且尚未在另一侧进入具体聊天时，合屏后优先在外屏延续该内容。用户可以继续阅读或操作，保留了原有的浮窗逻辑。</span
               ></button
-            ><button type="button" data-rule="2" aria-pressed="false">
+            ><button type="button" data-rule="2" disabled aria-pressed="false">
               <strong>规则二：交替并行场景下，优先保留操作中的内容</strong
               ><span
                 >当聊天与浮窗内容同时展示且正在交流时，合屏后优先延续用户当前正在操作的任务，另一项任务暂时退出屏幕，但保留其状态和恢复路径。</span
               ></button
-            ><button type="button" data-rule="3" aria-pressed="false">
+            ><button type="button" data-rule="3" disabled aria-pressed="false">
               <strong>规则三：适应可用空间宽度变化，避开弯折处</strong
               ><span
                 >当设备开合、部分折叠或微信窗口宽度变化时，根据实际可用空间调整面板布局。设备半折时，浮窗内容和组件避开中央弯折区域，减少遮挡与误触。</span
@@ -988,6 +990,7 @@
         </div>
       </footer>
     </main>
+    <script src="asset-loading.js"></script>
     <script type="module" src="main.js"></script>
     <script src="vendor/apple-duo/runtime.js"></script>
     <script type="module" src="mockup.js"></script>

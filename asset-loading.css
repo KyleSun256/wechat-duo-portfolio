@@ -1,0 +1,17 @@
+/* 保留图片原有布局，在资源解码完成前展示占位。 */
+html.asset-loading-enabled img:not([data-asset-ready]) { visibility: hidden; }
+.asset-group-pending > * { visibility: hidden !important; }
+.asset-group-pending * { animation-play-state: paused !important; }
+.asset-placeholder-layer { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+.asset-placeholder { position: fixed; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #858b8d; font-size: 14px; line-height: 1.4; border-radius: 12px; background: linear-gradient(110deg, #eeeff1 25%, #f8f9fa 38%, #eeeff1 52%); background-size: 200% 100%; animation: asset-shimmer 1.8s ease-in-out infinite; }
+.asset-placeholder[hidden] { display: none; }
+.asset-placeholder-spinner { width: 25px; height: 25px; border: 2px solid #d2d7d6; border-top-color: #00af6c; border-radius: 50%; animation: asset-spin .9s linear infinite; }
+.asset-placeholder-small { border-radius: 6px; gap: 0; }
+.asset-placeholder-small .asset-placeholder-spinner { width: 12px; height: 12px; border-width: 1.5px; }
+.asset-placeholder-small .asset-placeholder-label { display: none; }
+.asset-placeholder-error { animation: none; background: #eeeff1; }
+.asset-placeholder-error .asset-placeholder-spinner { display: none; }
+@keyframes asset-spin { to { transform: rotate(360deg); } }
+@keyframes asset-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .asset-placeholder, .asset-placeholder-spinner { animation: none; } }
+.device-scene .scene-status { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; margin: 0; padding: 0; color: #858b8d; font-size: 14px; background: #f2f3f5; }
